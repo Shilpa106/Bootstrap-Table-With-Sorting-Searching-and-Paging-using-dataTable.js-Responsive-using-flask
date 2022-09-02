@@ -1,0 +1,154 @@
+<html><link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+
+<!-- <style>
+	.hidden{
+        display:none;
+    }
+
+    .result{
+    	max-width:80px; 
+    }
+
+</style> -->
+
+<div class="row">
+
+	<div class="col-md-4"></div>
+
+	<div class="col-md-4">
+
+		<div class="card card-body">
+
+			<!-- Form Wrapper & Button -->
+			
+            <h1>hiiiii</h1>
+            <h1>{{ data }}</h1>
+            
+			<table border = 1>
+				{% for key, value in data[0].items() %}
+			
+				<tr>
+				   <th> {{ key }} </th></tr>
+				 <tr> <td> {{ value }} </td>
+				</tr>
+			
+				{% endfor %}
+			</table>
+
+			<!-- Data Table -->
+			<table class="table table-dark">
+			  <thead>
+			    <tr>
+			      <th scope="col">{{ key }}</th>
+			      <th scope="col">{{ value }}</th>
+
+			    </tr>
+			  </thead>
+			  <tbody id="tests-table">
+			    
+			  </tbody>
+			</table>
+
+		</div>
+
+	</div>
+
+	<div class="col-md-4"></div>
+</div>
+</html>
+
+<script>
+
+	var newId = 4
+	var newTest = {'name':null, 'id':newId, 'result':null}
+
+	
+
+	$('#test-result').on('keyup', function(){
+		newTest.result = $(this).val()
+		console.log(newTest)
+
+	})
+
+	$('#test-name').on('change', function(){
+		newTest.name = $(this).val()
+		console.log(newTest)
+	})
+
+	
+
+
+	// var tests = [
+	// 	{'name':'Distillation 50%', 'id':'1', 'result':"43"},
+	//     {'name':'Flash Point', 'id':'2', 'result':"61"},
+	//     {'name':'Water By Karl Fischer', 'id':'3', 'result':"24"},
+	// ]
+    
+    var tests=JSON.parse('{{data | tojson}}');
+    console.log(tests);
+    // // '{{ data }}';
+
+    // console.log("testssssssssssssssssssss",tests)
+
+	for (var i in tests){
+		addRow(tests[i])
+	}
+
+	function addRow(obj){
+		var row = `<tr scope="row" class="test-row-${obj.id}">
+	    			   <td>${obj.name}</td>
+	                   <td id="result-${obj.id}" data-testid="${obj.id}"">${obj.result}</td>
+	                   <td>
+	                   		
+	                   		<button class="btn btn-sm btn-info" disabled data-testid="${obj.id}"  id="save-${obj.id}">Save</button>
+	                   		
+	                   		
+	                   </td>
+	    		   </tr>`
+		$('#tests-table').append(row)
+
+		
+		$(`#save-${obj.id}`).on('click', saveUpdate)
+
+
+		$(`#result-${obj.id}`).on('click', editResult)
+		
+	}
+
+	function editResult(){
+		var testid = $(this).data('testid')
+		var value = $(this).html()
+
+		$(this).unbind()
+		$(this).html(`<input class="result form-control" data-testid="${testid}" type="text" value="${value}">`)
+
+		$(`.result`).on('keyup', function(){
+			var testid = $(this).data('testid')
+			var saveBtn = $(`#save-${testid}`)
+			saveBtn.prop('disabled', false)
+
+		})
+
+	}
+
+	function saveUpdate(){
+		console.log('Saved!')
+		var testid = $(this).data('testid')
+		var saveBtn = $(`#save-${testid}`)
+		var row = $(`.test-row-${testid}`)
+
+		saveBtn.prop('disabled', true)
+		row.css('opacity', "0.5")
+
+		setTimeout(function(){
+			row.css('opacity', '1')
+		}, 2000)
+
+
+	}
+
+
+
+</script>
